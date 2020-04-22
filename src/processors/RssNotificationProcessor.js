@@ -13,10 +13,6 @@ class RssNotificationProcessor extends Processor {
     let self = this;
 
     self.setupCronjob();
-
-    self.bot.onText(/\/halbwissenbotregisterchat/, function (msg, match) {
-      self.registerChat(msg.chat.id);
-    });
   }
 
   setupCronjob() {
@@ -73,18 +69,15 @@ class RssNotificationProcessor extends Processor {
     let self = this;
     console.log('notify about a new episode');
 
-    Chat.find().then((chats) => {
-      chats.forEach(chat => {
-        self.bot.sendMessage(chat.chatId, `Eine neue Folge ist raus:
+    this.bot.getAllChats()
+      .then(targets => {
+        // Send messages to targets
+        targets.forEach(target => {
+          self.bot.sendMessage(target.bot, target.chatId, `Eine neue Folge ist raus:
 ${item.link}
 #ghwfolge`);
-      })
-    });
-  }
-
-  registerChat(chatId) {
-    let chat = new Chat({chatId: chatId});
-    chat.save();
+        });
+      });
   }
 }
 
